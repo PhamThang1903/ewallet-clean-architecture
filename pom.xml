@@ -19,6 +19,7 @@
         <module>ewallet-payment</module>
         <module>ewallet-notification</module>
         <module>ewallet-config-server</module>
+        <module>ewallet-service-registry</module>
     </modules>
 
     <properties>
