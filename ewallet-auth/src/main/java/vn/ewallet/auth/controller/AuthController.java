@@ -3,16 +3,12 @@ package vn.ewallet.auth.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import vn.ewallet.auth.client.KeycloakAuthClient;
-import vn.ewallet.auth.dto.LoginRequest;
-import vn.ewallet.auth.dto.RefreshTokenRequest;
-import vn.ewallet.auth.dto.RegisterRequest;
-import vn.ewallet.auth.dto.TokenResponse;
+import vn.ewallet.auth.dto.*;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -58,5 +54,24 @@ public class AuthController {
         return ResponseEntity.ok(Map.of(
                 "message", "Verify OTP API placeholder"
         ));
+    }
+
+    @PostMapping("/step-up/check")
+    public ResponseEntity<?> checkStepUp(@RequestBody StepUpAuthRequest request) {
+        boolean highValue = request.amount() != null && request.amount().compareTo(new BigDecimal("5000000")) > 0;
+        boolean required = highValue;
+        return ResponseEntity.ok(Map.of(
+                "stepUpRequired", required,
+                "reason", required ? "HIGH_VALUE_TRANSACTION" : "NONE"
+        ));
+    }
+
+    @GetMapping("/devices")
+    public ResponseEntity<?> getTrustedDevices() {
+        return ResponseEntity.ok(List.of(Map.of(
+                "deviceId", "android-samsung-s918n-abc123",
+                "deviceName", "Samsung S23 Ultra",
+                "trusted", true
+        )));
     }
 }
