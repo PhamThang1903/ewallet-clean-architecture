@@ -1,0 +1,11 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+
+keycloak:
+  base-url: http://localhost:8180
+  realm: ewallet
+  client-id: mobile-app
