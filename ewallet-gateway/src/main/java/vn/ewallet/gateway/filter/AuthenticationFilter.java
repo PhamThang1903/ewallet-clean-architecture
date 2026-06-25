@@ -30,7 +30,13 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
             }
-            return chain.filter(exchange);
+
+            var mutatedRequest = exchange.getRequest()
+                    .mutate()
+                    .header("X-User-Id", "dev-user-001")
+                    .build();
+
+            return chain.filter(exchange.mutate().request(mutatedRequest).build());
         });
     }
 
