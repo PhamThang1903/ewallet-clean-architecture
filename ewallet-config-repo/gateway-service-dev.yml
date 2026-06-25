@@ -35,11 +35,31 @@ spring:
                 redis-rate-limiter.replenishRate: 5
                 redis-rate-limiter.burstCapacity: 10
                 redis-rate-limiter.requestedTokens: 1
+            - name: Retry
+              args:
+                retries: 2
+                statuses:
+                  - BAD_GATEWAY
+                  - SERVICE_UNAVAILABLE
+                  - GATEWAY_TIMEOUT
+                methods:
+                  - GET
+            - name: CircuitBreaker
+              args:
+                name: userServiceCB
+                fallbackUri: forward:/fallback/user
+
 
         - id: wallet-service
           uri: lb://WALLET-SERVICE
           predicates:
             - Path=/api/v1/wallets/**
+          filters:
+            - AuthenticationFilter
+            - name: CircuitBreaker
+              args:
+                name: walletServiceCB
+                fallbackUri: forward:/fallback/wallet
 
         - id: auth-service
           uri: lb://AUTH-SERVICE
@@ -64,3 +84,22 @@ management:
     web:
       exposure:
         include: health,info,gateway
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      userServiceCB:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+
+      walletServiceCB:
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
