@@ -1,2 +1,8 @@
 vn\ewallet\user\UserServiceApplication.class
+vn\ewallet\user\domain\model\UserProfile.class
+vn\ewallet\user\domain\model\KycLevel.class
+vn\ewallet\user\infrastructure\adapter\out\persistence\entity\UserJpaEntity.class
+vn\ewallet\user\domain\model\User.class
+vn\ewallet\user\domain\model\UserPreference.class
+vn\ewallet\user\domain\model\UserStatus.class
 vn\ewallet\user\infrastructure\adapter\in\web\UserTestController.class

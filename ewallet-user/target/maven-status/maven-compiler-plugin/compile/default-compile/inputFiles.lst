@@ -1,2 +1,8 @@
+D:\VSProject\e-wallet-clean\ewallet-user\src\main\java\vn\ewallet\user\domain\model\KycLevel.java
+D:\VSProject\e-wallet-clean\ewallet-user\src\main\java\vn\ewallet\user\domain\model\User.java
+D:\VSProject\e-wallet-clean\ewallet-user\src\main\java\vn\ewallet\user\domain\model\UserPreference.java
+D:\VSProject\e-wallet-clean\ewallet-user\src\main\java\vn\ewallet\user\domain\model\UserProfile.java
+D:\VSProject\e-wallet-clean\ewallet-user\src\main\java\vn\ewallet\user\domain\model\UserStatus.java
 D:\VSProject\e-wallet-clean\ewallet-user\src\main\java\vn\ewallet\user\infrastructure\adapter\in\web\UserTestController.java
+D:\VSProject\e-wallet-clean\ewallet-user\src\main\java\vn\ewallet\user\infrastructure\adapter\out\persistence\entity\UserJpaEntity.java
 D:\VSProject\e-wallet-clean\ewallet-user\src\main\java\vn\ewallet\user\UserServiceApplication.java

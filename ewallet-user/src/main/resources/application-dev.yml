@@ -7,8 +7,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/ewallet
-    username: ewallet
-    password: ewallet123
+    username: postgres
+    password: Thang.svmc26
 
   data:
     redis:
