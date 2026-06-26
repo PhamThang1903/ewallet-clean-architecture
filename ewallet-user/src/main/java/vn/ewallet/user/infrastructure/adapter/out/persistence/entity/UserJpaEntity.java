@@ -46,12 +46,25 @@ public class UserJpaEntity {
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
 
-    protected UserJpaEntity() {
+    @Column(name = "phone_verified")
+    private boolean phoneVerified;
 
-    }
+    @Column(name = "email_verified")
+    private boolean emailVerified;
+
 
     public void markDeleted() {
         this.status = "DELETED";
+        this.updatedAt = OffsetDateTime.now();
+    }
+
+    public void markPhoneVerified() {
+        this.phoneVerified = true;
+        this.updatedAt = OffsetDateTime.now();
+    }
+
+    public void markEmailVerified() {
+        this.emailVerified = true;
         this.updatedAt = OffsetDateTime.now();
     }
 }

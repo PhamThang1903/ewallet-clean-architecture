@@ -39,7 +39,9 @@ public class UserApplicationService {
                 "ACTIVE",
                 "LO",
                 OffsetDateTime.now(),
-                OffsetDateTime.now()
+                OffsetDateTime.now(),
+                false,
+                false
         );
 
         UserJpaEntity saved = userJpaRepository.save(entity);
@@ -64,6 +66,19 @@ public class UserApplicationService {
         UserJpaEntity user = userJpaRepository.findByKeycloakUserId(keycloakUserId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         user.markDeleted();
+        userJpaRepository.save(user);
+    }
+
+    @Transactional
+    public void markVerified(String keycloakUserId, String purpose) {
+        UserJpaEntity user = userJpaRepository.findByKeycloakUserId(keycloakUserId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if ("PHONE_VERIFY".equals(purpose)) {
+            user.markPhoneVerified();
+        } else if ("EMAIL_VERIFY".equals(purpose)) {
+            user.markEmailVerified();
+        }
+
         userJpaRepository.save(user);
     }
 

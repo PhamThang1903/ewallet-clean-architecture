@@ -4,10 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.ewallet.user.application.service.OtpService;
 import vn.ewallet.user.application.service.UserApplicationService;
-import vn.ewallet.user.infrastructure.adapter.in.web.dto.CreateUserRequest;
-import vn.ewallet.user.infrastructure.adapter.in.web.dto.UpdateProfileRequest;
-import vn.ewallet.user.infrastructure.adapter.in.web.dto.UserResponse;
+import vn.ewallet.user.infrastructure.adapter.in.web.dto.*;
 
 import java.util.Map;
 import java.util.UUID;
@@ -17,6 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController {
     private final UserApplicationService userService;
+    private final OtpService otpService;
 
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
@@ -54,6 +54,32 @@ public class UserController {
         userService.deleteByKeycloakUserId(keycloakUserId);
         return ResponseEntity.ok(Map.of(
                 "message", "User deleted"
+        ));
+    }
+
+    @PostMapping("/me/otp/send")
+    public ResponseEntity<?> sendOtp(@RequestHeader("X-User-Id") String keycloakUserId, @RequestBody SendOtpRequest request) {
+        String otp = otpService.generateOtp(keycloakUserId, request.purpose());
+        return ResponseEntity.ok(Map.of(
+                "message", "OTP generated",
+                "devOtp", otp
+        ));
+    }
+
+    @PostMapping("/me/otp/verify")
+    public ResponseEntity<?> verifyOtp(@RequestHeader("X-User-Id") String keycloakUserId, @RequestBody VerifyOtpRequest request) {
+        boolean valid = otpService.verifyOtp(keycloakUserId, request.purpose(), request.otp());
+        if (valid)
+            userService.markVerified(keycloakUserId, request.purpose());
+        if (!valid) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", "Invalid or expired OTP"
+            ));
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "message", "OTP verified",
+                "purpose", request.purpose()
         ));
     }
 }
