@@ -4,12 +4,16 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
+@Getter
+@AllArgsConstructor
 public class UserJpaEntity {
 
     @Id
@@ -43,6 +47,11 @@ public class UserJpaEntity {
     private OffsetDateTime updatedAt;
 
     protected UserJpaEntity() {
-        
+
+    }
+
+    public void markDeleted() {
+        this.status = "DELETED";
+        this.updatedAt = OffsetDateTime.now();
     }
 }
