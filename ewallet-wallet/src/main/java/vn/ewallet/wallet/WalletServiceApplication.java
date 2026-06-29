@@ -1,13 +1,13 @@
-package vn.ewallet.user;
+package vn.ewallet.wallet;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableScheduling
-@SpringBootApplication(scanBasePackages = "vn.ewallet")
-public class UserServiceApplication {
+@SpringBootApplication
+public class WalletServiceApplication {
     public static void main(String[] args) {
-        SpringApplication.run(UserServiceApplication.class, args);
+        SpringApplication.run(WalletServiceApplication.class, args);
     }
 }
