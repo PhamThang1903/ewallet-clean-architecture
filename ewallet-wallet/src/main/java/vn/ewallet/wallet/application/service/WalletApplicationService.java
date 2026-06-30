@@ -134,6 +134,13 @@ public class WalletApplicationService {
         return transactionJpaRepository.findByWalletIdOrderByCreatedAtDesc(walletId, pageable);
     }
 
+    @Transactional(readOnly = true)
+    public WalletResponse getMainWalletByUserId(UUID userId) {
+        WalletJpaEntity wallet = walletJpaRepository.findByUserIdAndWalletType(userId, "MAIN")
+                .orElseThrow(() -> new IllegalArgumentException("Main wallet not found"));
+        return toResponse(wallet);
+    }
+
     private <T> T executeWithOptimisticRetry(SupplierWithException<T> supplier) {
         int maxRetries = 3;
         for (int i = 0; i < maxRetries; i++) {
