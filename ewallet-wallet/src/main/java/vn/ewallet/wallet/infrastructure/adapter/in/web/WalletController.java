@@ -3,14 +3,16 @@ package vn.ewallet.wallet.infrastructure.adapter.in.web;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vn.ewallet.common.idempotency.IdempotencyKey;
 import vn.ewallet.common.response.ApiResponse;
 import vn.ewallet.wallet.application.dto.CreateWalletCommand;
 import vn.ewallet.wallet.application.dto.MoneyCommand;
+import vn.ewallet.wallet.application.dto.WalletBalanceResponse;
+import vn.ewallet.wallet.application.idempotency.IdempotencyService;
 import vn.ewallet.wallet.application.service.WalletApplicationService;
 import vn.ewallet.wallet.infrastructure.adapter.in.web.dto.CreateWalletRequest;
 import vn.ewallet.wallet.infrastructure.adapter.in.web.dto.MoneyRequest;
 
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -18,13 +20,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WalletController {
     private final WalletApplicationService walletService;
+    private final IdempotencyService idempotencyService;
 
     @PostMapping
     public ResponseEntity<?> createWallet(@RequestHeader("X-User-Id") UUID userId, @RequestBody CreateWalletRequest request) {
         var response = walletService.createWallet(
                 new CreateWalletCommand(
                         userId,
-                        request.currency() == null? "VND" : request.currency(),
+                        request.currency() == null ? "VND" : request.currency(),
                         request.walletType() == null ? "MAIN" : request.walletType()
                 )
         );
@@ -55,34 +58,38 @@ public class WalletController {
 
     @PostMapping("/{walletId}/credit")
     public ResponseEntity<?> credit(@PathVariable UUID walletId, @RequestHeader("Idempotency-Key") String idempotencyKey, @RequestBody MoneyRequest request) {
-        var response = walletService.credit(
-               new MoneyCommand(
-                       walletId,
-                       request.amount(),
-                       request.currency() == null ? "VND": request.currency(),
-                       request.category() == null ? "ADJUSTMENT" : request.category(),
-                       request.referenceId(),
-                       idempotencyKey,
-                       request.description()
-               )
-        );
+        new IdempotencyKey(idempotencyKey);
+        var response = idempotencyService.execute(idempotencyKey, WalletBalanceResponse.class,
+                () -> walletService.credit(
+                        new MoneyCommand(
+                                walletId,
+                                request.amount(),
+                                request.currency() == null ? "VND" : request.currency(),
+                                request.category() == null ? "ADJUSTMENT" : request.category(),
+                                request.referenceId(),
+                                idempotencyKey,
+                                request.description()
+                        )
+                ));
 
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PostMapping("/{walletId}/debit")
     public ResponseEntity<?> debit(@PathVariable UUID walletId, @RequestHeader("Idempotency-Key") String idempotencyKey, @RequestBody MoneyRequest request) {
-        var response = walletService.debit(
-                new MoneyCommand(
-                        walletId,
-                        request.amount(),
-                        request.currency() == null ? "VND": request.currency(),
-                        request.category() == null ? "ADJUSTMENT" : request.category(),
-                        request.referenceId(),
-                        idempotencyKey,
-                        request.description()
-                )
-        );
+        new IdempotencyKey(idempotencyKey);
+        var response = idempotencyService.execute(idempotencyKey, WalletBalanceResponse.class,
+                () -> walletService.debit(
+                        new MoneyCommand(
+                                walletId,
+                                request.amount(),
+                                request.currency() == null ? "VND" : request.currency(),
+                                request.category() == null ? "ADJUSTMENT" : request.category(),
+                                request.referenceId(),
+                                idempotencyKey,
+                                request.description()
+                        )
+                ));
 
         return ResponseEntity.ok(ApiResponse.success(response));
     }
