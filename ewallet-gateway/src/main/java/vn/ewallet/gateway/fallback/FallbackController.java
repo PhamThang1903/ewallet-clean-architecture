@@ -30,4 +30,14 @@ public class FallbackController {
                 "timestamp", Instant.now().toString()
         );
     }
+
+    @GetMapping("/fallback/transfer")
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public Map<String, Object> transferServiceFallback() {
+        return Map.of(
+                "success", false,
+                "message", "Transfer Service is temporarily unavailable",
+                "timestamp", Instant.now().toString()
+        );
+    }
 }

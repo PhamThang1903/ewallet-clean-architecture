@@ -16,7 +16,28 @@ public class TransferSagaOrchestrator {
     @Transactional
     public TransferJpaEntity execute(TransferJpaEntity transfer) {
         try {
+            validate(transfer);
+            transfer.markValidated();
+            transferJpaRepository.save(transfer);
 
+            debitSourceWallet(transfer);
+            transfer.markDebited();
+            transferJpaRepository.save(transfer);
+
+            creditTargetWallet(transfer);
+            transfer.markCredited();
+            transferJpaRepository.save(transfer);
+
+            notifyBestEffort(transfer);
+            auditBestEffort(transfer);
+            rewardBestEffort(transfer);
+
+            transfer.markCompleted();
+            return transferJpaRepository.save(transfer);
+        } catch (Exception ex) {
+            compensateIfNeeded(transfer);
+            transfer.markFailed(ex.getMessage());
+            return transferJpaRepository.save(transfer);
         }
     }
 
